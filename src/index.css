@@ -1018,8 +1018,7 @@ body {
 
   border: 1px solid rgba(34, 211, 238, 0.2);
 
-  box-shadow:
-    0 0 0 3px rgba(34, 211, 238, 0.08);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.08);
 }
 
 .password-rules span {
@@ -1053,13 +1052,8 @@ body {
   .intro {
     min-height: auto;
     overflow-x: hidden;
-    padding: 0 20px 0;
+    padding: 0 20px;
     gap: 0;
-  }
-
-  .hero {
-    margin-top: -20px;
-    margin-bottom: 0;
   }
 
   nav {
@@ -1067,16 +1061,41 @@ body {
     padding-bottom: 0;
   }
 
-.intro img {
-  width: 100%;
-  max-width: 500px;
-  margin: 20px auto 0;
-  display: block;
-}
+  .hero {
+    margin-top: -20px;
+    margin-bottom: 0;
   }
 
   .auth-card {
     width: 100%;
     max-width: 100%;
-    margin-bottom: 0;
+    margin-bottom: 30px;
   }
+
+  .intro img {
+    width: 100%;
+    max-width: 500px;   
+    display: block;
+  }
+}
+
+.social-btn {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  line-height: 1;
+}
+
+.social-btn img {
+  width: 22px;
+  height: 22px;
+
+  object-fit: contain;
+
+  display: block;
+}
