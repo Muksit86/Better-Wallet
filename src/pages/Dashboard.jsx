@@ -54,6 +54,14 @@ export async function dashboardAction({ request }) {
 
   // create budget
   if (_action === "createBudget") {
+    if (!values.newBudget.trim()) {
+      return toast.error("Budget name is required");
+    }
+
+    if (Number(values.newBudgetAmount) <= 0) {
+      return toast.error("Budget amount must be greater than 0");
+    }
+
     try {
       const budgets = await getBudgetsFromFirestore();
 
@@ -67,7 +75,7 @@ export async function dashboardAction({ request }) {
       const color = generatedColors[colorIndex % generatedColors.length];
 
       await addBudgetToFirestore({
-        name: values.newBudget,
+        name: values.newBudget.trim(),
 
         amount: values.newBudgetAmount,
 
@@ -88,9 +96,17 @@ export async function dashboardAction({ request }) {
 
   // create expense
   if (_action === "createExpense") {
+    if (!values.newExpense.trim()) {
+      return toast.error("Expense name is required");
+    }
+
+    if (Number(values.newExpenseAmount) <= 0) {
+      return toast.error("Expense amount must be greater than 0");
+    }
+
     try {
       await addExpenseToFirestore({
-        name: values.newExpense,
+        name: values.newExpense.trim(),
 
         amount: values.newExpenseAmount,
 
@@ -99,7 +115,7 @@ export async function dashboardAction({ request }) {
         createdAt: Date.now(),
       });
 
-      return toast.success(`Expense ${values.newExpense} Created!`);
+      return toast.success(`Expense ${values.newExpense.trim()} Created!`);
     } catch (e) {
       console.log(e);
 

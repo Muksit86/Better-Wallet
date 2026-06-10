@@ -12,7 +12,7 @@ import {
   Legend,
 } from "recharts";
 
-import { formatCurrency } from "../helpers";
+import { formatCurrency, formatCompactCurrency } from "../helpers";
 
 const Analytics = ({ budgets, expenses }) => {
   // total budget
@@ -88,13 +88,13 @@ const Analytics = ({ budgets, expenses }) => {
         <div className="analytics-card">
           <h4>Total Budget</h4>
 
-          <h2>{formatCurrency(totalBudget)}</h2>
+          <h2>{formatCompactCurrency(totalBudget)}</h2>
         </div>
 
         <div className="analytics-card">
           <h4>Total Spent</h4>
 
-          <h2>{formatCurrency(totalSpent)}</h2>
+          <h2>{formatCompactCurrency(totalSpent)}</h2>
         </div>
 
         <div className="analytics-card">
@@ -105,22 +105,28 @@ const Analytics = ({ budgets, expenses }) => {
               color: remaining < 0 ? "#ef4444" : "#22c55e",
             }}
           >
-            {formatCurrency(remaining)}
+            {formatCompactCurrency(remaining)}
           </h2>
         </div>
 
         <div className="analytics-card">
           <h4>Most Spent</h4>
 
-          <h2>{topCategory?.name || "None"}</h2>
+          <h2 title={topCategory?.name}>
+            {topCategory?.name
+              ? topCategory.name.length > 12
+                ? `${topCategory.name.slice(0, 12)}...`
+                : topCategory.name
+              : "None"}
+          </h2>
 
-          <small>{formatCurrency(topCategory?.spent || 0)}</small>
+          <small>{formatCompactCurrency(topCategory?.spent || 0)}</small>
         </div>
 
         <div className="analytics-card">
           <h4>This Month</h4>
 
-          <h2>{formatCurrency(thisMonthTotal)}</h2>
+          <h2>{formatCompactCurrency(thisMonthTotal)}</h2>
         </div>
       </div>
 
@@ -165,7 +171,7 @@ const Analytics = ({ budgets, expenses }) => {
                     fill: "#111827",
                   }}
                 >
-                  {formatCurrency(totalSpent)}
+                  {formatCompactCurrency(totalSpent)}
                 </text>
 
                 <text
@@ -263,6 +269,7 @@ const Analytics = ({ budgets, expenses }) => {
                 />
 
                 <YAxis
+                  tickFormatter={(value) => formatCompactCurrency(value)}
                   tick={{
                     fill: "#6b7280",
                     fontSize: 13,

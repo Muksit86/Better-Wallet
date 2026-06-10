@@ -19,9 +19,7 @@ const AddExpenseFrom = ({ budgets }) => {
       // clear form
       formRef.current.reset();
       // detect if device is mobile
-      const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(
-        navigator.userAgent
-      );
+      const isMobile = window.matchMedia("(pointer: coarse)").matches;
       if (!isMobile) {
         focusRef.current.focus();
       } else {
@@ -36,8 +34,14 @@ const AddExpenseFrom = ({ budgets }) => {
     <div className="form-wrapper">
       <h2 className="h3">
         Add New{" "}
-        <span className="accent">
-          {budgets.length === 1 && `${budgets.map((budg) => budg.name)}`}
+        <span
+          className="accent"
+          title={budgets.length === 1 ? budgets[0].name : ""}
+        >
+          {budgets.length === 1 &&
+            (budgets[0].name.length > 20
+              ? `${budgets[0].name.slice(0, 20)}...`
+              : budgets[0].name)}
         </span>{" "}
         Expense
       </h2>
@@ -59,6 +63,7 @@ const AddExpenseFrom = ({ budgets }) => {
             <input
               type="number"
               step="0.01"
+              min="0.01"
               inputMode="decimal"
               name="newExpenseAmount"
               id="newExpenseAmount"

@@ -25,8 +25,18 @@ const ExpenseItem = ({ expense, budgets = [], showBudget }) => {
   // save expense
   const handleSave = async () => {
     try {
+      if (!name.trim()) {
+        toast.error("Expense name is required");
+        return;
+      }
+
+      if (Number(amount) <= 0) {
+        toast.error("Expense amount must be greater than 0");
+        return;
+      }
+
       await updateExpenseInFirestore(expense.id, {
-        name,
+        name: name.trim(),
 
         amount: Number(amount),
       });
@@ -51,7 +61,11 @@ const ExpenseItem = ({ expense, budgets = [], showBudget }) => {
             onChange={(e) => setName(e.target.value)}
           />
         ) : (
-          expense.name
+          <span title={expense.name}>
+            {expense.name.length > 30
+              ? `${expense.name.slice(0, 30)}...`
+              : expense.name}
+          </span>
         )}
       </td>
 
@@ -60,6 +74,8 @@ const ExpenseItem = ({ expense, budgets = [], showBudget }) => {
         {editing ? (
           <input
             type="number"
+            min="0.01"
+            step="0.01"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
@@ -77,29 +93,23 @@ const ExpenseItem = ({ expense, budgets = [], showBudget }) => {
           {budget ? (
             <Link
               to={`/budget/${budget.id}`}
+              title={budget.name}
               style={{
                 "--backdrop": `hsl(${budget.color})`,
-
                 background: `hsl(${budget.color})`,
-
                 color: "#fff",
-
                 padding: "0.45rem 1rem",
-
                 borderRadius: "100rem",
-
                 textDecoration: "none",
-
                 fontWeight: "600",
-
                 display: "inline-block",
-
                 minWidth: "120px",
-
                 textAlign: "center",
               }}
             >
-              {budget.name}
+              {budget.name.length > 20
+                ? `${budget.name.slice(0, 20)}...`
+                : budget.name}
             </Link>
           ) : (
             <span>No Budget</span>
@@ -152,7 +162,11 @@ const ExpenseItem = ({ expense, budgets = [], showBudget }) => {
         {editing ? (
           <button
             className="btn btn--outline"
-            onClick={() => setEditing(false)}
+            onClick={() => {
+              setName(expense.name);
+              setAmount(expense.amount);
+              setEditing(false);
+            }}
             title="Cancel"
             style={{
               "--outline": "#6b7280",

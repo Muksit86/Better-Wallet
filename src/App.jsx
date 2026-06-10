@@ -21,6 +21,8 @@ import { deleteBudget } from "./actions/deleteBudget";
 // pages
 import Dashboard, { dashboardAction, dashboardLoader } from "./pages/Dashboard";
 
+import ReauthenticatePage from "./pages/ReauthenticatePage";
+
 import Error from "./pages/Error";
 
 import ExpensesPage, {
@@ -128,6 +130,19 @@ const router = createBrowserRouter([
         loader: expensesLoader,
 
         action: expensesAction,
+
+        errorElement: <Error />,
+      },
+
+      // REAUTHENTICATE
+      {
+        path: "reauthenticate",
+
+        element: (
+          <ProtectedRoute>
+            <ReauthenticatePage />
+          </ProtectedRoute>
+        ),
 
         errorElement: <Error />,
       },

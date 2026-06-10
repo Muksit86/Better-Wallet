@@ -54,6 +54,24 @@ const Login = () => {
 
     setError("");
 
+    // username validation
+    if (isSignup) {
+      if (name.trim().length < 5) {
+        setError("Username must be at least 5 characters.");
+        return;
+      }
+
+      if (!/[A-Za-z]/.test(name.trim())) {
+        setError("Username must contain at least one letter.");
+        return;
+      }
+
+      if (!/^[A-Za-z0-9 ]+$/.test(name.trim())) {
+        setError("Only letters, numbers, and spaces are allowed.");
+        return;
+      }
+    }
+
     try {
       // keep user logged in
       await setPersistence(auth, browserLocalPersistence);
@@ -249,7 +267,7 @@ const Login = () => {
               <input
                 type="text"
                 required
-                placeholder="Enter your name"
+                placeholder="Enter your username"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />

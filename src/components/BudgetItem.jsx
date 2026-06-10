@@ -12,7 +12,11 @@ import {
 } from "@heroicons/react/24/outline";
 
 // helper functions
-import { formatCurrency, formatPercentage } from "../helpers";
+import {
+  formatCurrency,
+  formatCompactCurrency,
+  formatPercentage,
+} from "../helpers";
 
 // firebase
 import { updateBudgetInFirestore } from "../firebase/firestore";
@@ -34,8 +38,18 @@ const BudgetItem = ({ budget, showDelete = false }) => {
   // save updated budget
   const handleSave = async () => {
     try {
+      if (!budgetName.trim()) {
+        toast.error("Budget name is required");
+        return;
+      }
+
+      if (Number(budgetAmount) <= 0) {
+        toast.error("Budget amount must be greater than 0");
+        return;
+      }
+
       await updateBudgetInFirestore(id, {
-        name: budgetName,
+        name: budgetName.trim(),
 
         amount: Number(budgetAmount),
       });
@@ -57,13 +71,8 @@ const BudgetItem = ({ budget, showDelete = false }) => {
     >
       {/* top section */}
       <div className="progress-text">
-        <div
-          style={{
-            width: "100%",
-          }}
-        >
-          {/* budget name */}
-          {editing ? (
+        {editing ? (
+          <div style={{ width: "100%" }}>
             <input
               type="text"
               value={budgetName}
@@ -72,21 +81,24 @@ const BudgetItem = ({ budget, showDelete = false }) => {
                 marginBottom: "0.7rem",
               }}
             />
-          ) : (
-            <h3>{name}</h3>
-          )}
 
-          {/* budget amount */}
-          {editing ? (
             <input
               type="number"
+              min="0.01"
+              step="0.01"
               value={budgetAmount}
               onChange={(e) => setBudgetAmount(e.target.value)}
             />
-          ) : (
-            <p>{formatCurrency(Number(amount))} Budgeted</p>
-          )}
-        </div>
+          </div>
+        ) : (
+          <>
+            <h3 title={name}>
+              {name.length > 20 ? `${name.slice(0, 20)}...` : name}
+            </h3>
+
+            <p>{formatCompactCurrency(Number(amount))} Budgeted</p>
+          </>
+        )}
       </div>
 
       {/* progress bar */}
@@ -96,9 +108,9 @@ const BudgetItem = ({ budget, showDelete = false }) => {
 
       {/* bottom text */}
       <div className="progress-text">
-        <small>{formatCurrency(spent)} Spent</small>
+        <small>{formatCompactCurrency(spent)} Spent</small>
 
-        <small>{formatCurrency(Number(amount) - spent)} Remaining</small>
+        <small>{formatCompactCurrency(Number(amount) - spent)} Remaining</small>
       </div>
 
       {/* buttons */}
@@ -139,7 +151,11 @@ const BudgetItem = ({ budget, showDelete = false }) => {
             {/* cancel */}
             <button
               className="btn btn--outline"
-              onClick={() => setEditing(false)}
+              onClick={() => {
+                setBudgetName(name);
+                setBudgetAmount(amount);
+                setEditing(false);
+              }}
               style={{
                 "--outline": "#6b7280",
 

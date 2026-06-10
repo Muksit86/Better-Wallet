@@ -1,5 +1,5 @@
 // rrd imports
-import { Form, NavLink } from "react-router-dom";
+import { Form, NavLink, useLocation } from "react-router-dom";
 
 // library icons
 import {
@@ -11,6 +11,8 @@ import {
 import logomark from "../assets/logomark.svg";
 
 const Nav = ({ user }) => {
+  const location = useLocation();
+  const isReauthPage = location.pathname === "/reauthenticate";
   return (
     <nav>
       {/* logo */}
@@ -21,7 +23,7 @@ const Nav = ({ user }) => {
       </NavLink>
 
       {/* buttons */}
-      {user && (
+      {user && !isReauthPage && (
         <div
           style={{
             display: "flex",
@@ -29,10 +31,10 @@ const Nav = ({ user }) => {
           }}
         >
           {/* delete user */}
-          <Form
-            method="post"
-            action="/logout"
-            onSubmit={(event) => {
+          <NavLink
+            to="/reauthenticate"
+            className="btn btn--warning"
+            onClick={(event) => {
               if (
                 !confirm(
                   "Do you really want to permanently delete your account and all data?",
@@ -42,18 +44,19 @@ const Nav = ({ user }) => {
               }
             }}
           >
-            <input type="hidden" name="deleteAccount" value="true" />
+            <span>Delete User</span>
 
-            <button type="submit" className="btn btn--warning">
-              <span>Delete User</span>
-
-              <TrashIcon width={20} />
-            </button>
-          </Form>
-
+            <TrashIcon width={20} />
+          </NavLink>
           {/* logout */}
           <Form method="post" action="/logout">
-            <button type="submit" className="btn btn--accent">
+            <button
+              type="submit"
+              className="btn btn--accent"
+              style={{
+                fontWeight: "600",
+              }}
+            >
               <span>Log out</span>
 
               <ArrowRightOnRectangleIcon width={20} />

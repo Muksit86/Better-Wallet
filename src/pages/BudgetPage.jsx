@@ -14,9 +14,11 @@ import {
   Bar,
   XAxis,
   YAxis,
+  CartesianGrid,
 } from "recharts";
 
 import { DocumentArrowDownIcon } from "@heroicons/react/24/solid";
+import { formatCompactCurrency } from "../helpers";
 
 // components
 import BudgetItem from "../components/BudgetItem";
@@ -105,9 +107,16 @@ export async function budgetAction({ request }) {
 
   // create expense
   if (_action === "createExpense") {
+    if (!values.newExpense.trim()) {
+      return toast.error("Expense name is required");
+    }
+
+    if (Number(values.newExpenseAmount) <= 0) {
+      return toast.error("Expense amount must be greater than 0");
+    }
     try {
       await addExpenseToFirestore({
-        name: values.newExpense,
+        name: values.newExpense.trim(),
 
         amount: values.newExpenseAmount,
 
@@ -116,7 +125,7 @@ export async function budgetAction({ request }) {
         createdAt: Date.now(),
       });
 
-      return toast.success(`Expense ${values.newExpense} Created!`);
+      return toast.success(`Expense ${values.newExpense.trim()} Created!`);
     } catch (e) {
       throw new Error("There was a problem creating your expense.");
     }
@@ -150,16 +159,24 @@ const BudgetPage = () => {
       ? Math.max(...expenses.map((expense) => Number(expense.amount)))
       : 0;
 
-  const pieData = [
-    {
-      name: "Spent",
-      value: totalSpent,
-    },
-    {
-      name: "Remaining",
-      value: remaining > 0 ? remaining : 0,
-    },
-  ];
+const pieData =
+  remaining > 0
+    ? [
+        {
+          name: "Spent",
+          value: totalSpent,
+        },
+        {
+          name: "Remaining",
+          value: remaining,
+        },
+      ]
+    : [
+        {
+          name: "Spent",
+          value: totalSpent,
+        },
+      ];
 
   const chartData = expenses.map((expense) => ({
     name: expense.name,
@@ -183,7 +200,12 @@ const BudgetPage = () => {
         }}
       >
         <h1 className="h2">
-          <span className="accent">{budget.name}</span> Overview
+          <span className="accent" title={budget.name}>
+            {budget.name.length > 20
+              ? `${budget.name.slice(0, 20)}...`
+              : budget.name}
+          </span>{" "}
+          Overview
         </h1>
 
         <button
@@ -252,14 +274,51 @@ const BudgetPage = () => {
                   <Pie
                     data={pieData}
                     dataKey="value"
-                    innerRadius={70}
-                    outerRadius={110}
-                    paddingAngle={5}
+                    innerRadius={95}
+                    outerRadius={130}
+                    paddingAngle={3}
+                    cornerRadius={10}
+                    stroke="none"
+                    animationDuration={1400}
                   >
-                    <Cell fill={`hsl(${budget.color})`} />
-
-                    <Cell fill="#d1d5db" />
+                    {pieData.map((entry, index) => (
+                      <Cell
+                        key={index}
+                        fill={index === 0 ? `hsl(${budget.color})` : "#d1d5db"}
+                        style={{
+                          filter: "drop-shadow(0 8px 14px rgba(0,0,0,0.12))",
+                        }}
+                      />
+                    ))}
                   </Pie>
+
+                  <text
+                    x="50%"
+                    y="48%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    style={{
+                      fontSize: "2rem",
+                      fontWeight: 800,
+                      fill: "#111827",
+                    }}
+                  >
+                    {formatCompactCurrency(totalSpent)}
+                  </text>
+
+                  <text
+                    x="50%"
+                    y="58%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    style={{
+                      fontSize: "0.9rem",
+                      fill: "#6b7280",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Spent
+                  </text>
 
                   <Tooltip
                     contentStyle={{
@@ -294,10 +353,41 @@ const BudgetPage = () => {
 
             {expenses.length > 0 ? (
               <ResponsiveContainer width="100%" height={320}>
-                <BarChart data={chartData} barCategoryGap="45%">
-                  <XAxis dataKey="name" />
+                <BarChart
+                  data={chartData}
+                  margin={{
+                    top: 10,
+                    right: 20,
+                    left: 35,
+                    bottom: 10,
+                  }}
+                  barCategoryGap="25%"
+                >
+                  <CartesianGrid
+                    strokeDasharray="4 4"
+                    vertical={false}
+                    opacity={0.08}
+                  />
+                  <XAxis
+                    dataKey="name"
+                    tick={{
+                      fill: "#6b7280",
+                      fontSize: 14,
+                      fontWeight: 600,
+                    }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
 
-                  <YAxis />
+                  <YAxis
+                    tickFormatter={(value) => formatCompactCurrency(value)}
+                    tick={{
+                      fill: "#6b7280",
+                      fontSize: 13,
+                    }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
 
                   <Tooltip
                     cursor={{
@@ -313,15 +403,20 @@ const BudgetPage = () => {
 
                   <Bar
                     dataKey="amount"
-                    fill={`hsl(${budget.color})`}
-                    radius={[10, 10, 0, 0]}
-                    maxBarSize={70}
-                    activeBar={{
-                      filter: "brightness(1.12)",
-                      stroke: "#fff",
-                      strokeWidth: 2,
-                    }}
-                  />
+                    radius={[18, 18, 0, 0]}
+                    animationDuration={1400}
+                    maxBarSize={65}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={`hsl(${budget.color})`}
+                        style={{
+                          filter: "drop-shadow(0 8px 12px rgba(0,0,0,0.12))",
+                        }}
+                      />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -347,10 +442,20 @@ const BudgetPage = () => {
       {expenses && expenses.length > 0 && (
         <div className="grid-md">
           <h2>
-            <span className="accent">{budget.name}</span> Expenses
+            <span className="accent" title={budget.name}>
+              {budget.name.length > 20
+                ? `${budget.name.slice(0, 20)}...`
+                : budget.name}
+            </span>{" "}
+            Expenses
           </h2>
 
-          <Table expenses={expenses} showBudget={false} />
+          <Table
+            expenses={[...expenses].sort(
+              (a, b) => Number(b.createdAt) - Number(a.createdAt),
+            )}
+            showBudget={false}
+          />
         </div>
       )}
     </div>

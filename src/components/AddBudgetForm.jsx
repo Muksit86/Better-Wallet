@@ -18,9 +18,7 @@ const AddBudgetForm = () => {
     if (!isSubmitting) {
       formRef.current.reset();
       // detect mobile device
-      const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(
-        navigator.userAgent
-      );
+      const isMobile = window.matchMedia("(pointer: coarse)").matches;
       if (!isMobile) {
         focusRef.current.focus();
       } else {
@@ -50,6 +48,7 @@ const AddBudgetForm = () => {
           <input
             type="number"
             step="0.01"
+            min="0.01"
             name="newBudgetAmount"
             id="newBudgetAmount"
             placeholder="e.g., ₹150"
