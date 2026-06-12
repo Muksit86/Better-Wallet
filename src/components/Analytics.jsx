@@ -74,7 +74,7 @@ const Analytics = ({ budgets, expenses }) => {
   // bar chart data
   const monthlyData = activeBudgets.map((budget) => ({
     name:
-      budget.name.length > 14 ? budget.name.slice(0, 14) + "…" : budget.name,
+      budget.name.length > 8 ? budget.name.slice(0, 8) + "…" : budget.name,
 
     spent: budget.spent,
 
