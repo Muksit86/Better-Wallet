@@ -7,12 +7,19 @@ import { useFetcher } from "react-router-dom";
 // library imports
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 
-const AddExpenseFrom = ({ budgets }) => {
+const AddExpenseFrom = ({ budgets = [] }) => {
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state === "submitting";
 
   const formRef = useRef();
   const focusRef = useRef();
+  const budgetList = Array.isArray(budgets) ? budgets : [];
+  const singleBudget = budgetList.length === 1 ? budgetList[0] : null;
+  const singleBudgetName = singleBudget?.name ?? "";
+  const displayBudgetName =
+    singleBudgetName.length > 20
+      ? `${singleBudgetName.slice(0, 20)}...`
+      : singleBudgetName;
 
   useEffect(() => {
     if (!isSubmitting) {
@@ -34,14 +41,8 @@ const AddExpenseFrom = ({ budgets }) => {
     <div className="form-wrapper">
       <h2 className="h3">
         Add New{" "}
-        <span
-          className="accent"
-          title={budgets.length === 1 ? budgets[0].name : ""}
-        >
-          {budgets.length === 1 &&
-            (budgets[0].name.length > 20
-              ? `${budgets[0].name.slice(0, 20)}...`
-              : budgets[0].name)}
+        <span className="accent" title={singleBudget ? singleBudgetName : ""}>
+          {singleBudget && displayBudgetName}
         </span>{" "}
         Expense
       </h2>
@@ -72,11 +73,11 @@ const AddExpenseFrom = ({ budgets }) => {
             />
           </div>
         </div>
-        <div className="grid-xs" hidden={budgets.length === 1}>
+        <div className="grid-xs" hidden={budgetList.length === 1}>
           <label htmlFor="newExpenseBudget">Budget Category</label>
           <select name="newExpenseBudget" id="newExpenseBudget" required>
-            {budgets
-              .sort((a, b) => a.createdAt - b.createdAt)
+            {[...budgetList]
+              .sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0))
               .map((budget) => {
                 return (
                   <option key={budget.id} value={budget.id}>

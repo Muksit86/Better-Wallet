@@ -18,11 +18,11 @@ const budgets = [
   },
 ];
 
-function renderForm() {
+function renderForm(budgetData = budgets) {
   const router = createMemoryRouter([
     {
       path: "/",
-      element: <AddExpenseFrom budgets={[]} />,
+      element: <AddExpenseFrom budgets={budgetData} />,
     },
   ]);
 
