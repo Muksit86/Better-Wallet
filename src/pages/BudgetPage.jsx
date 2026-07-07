@@ -193,6 +193,11 @@ const BudgetPage = () => {
 
   const remaining = Number(budget.amount) - totalSpent;
 
+  const budgetWithCurrentSpent = {
+    ...budget,
+    spent: totalSpent,
+  };
+
   const highestExpense =
     expenses.length > 0
       ? Math.max(...expenses.map((expense) => Number(expense.amount)))
@@ -251,7 +256,7 @@ const BudgetPage = () => {
 
         <button
           className="btn btn--dark"
-          onClick={() => exportBudgetPDF(budget, expenses)}
+          onClick={() => exportBudgetPDF(budgetWithCurrentSpent, expenses)}
         >
           <DocumentArrowDownIcon width={20} />
 
@@ -261,9 +266,9 @@ const BudgetPage = () => {
 
       {/* top cards */}
       <div className="flex-lg">
-        <BudgetItem budget={budget} showDelete={true} />
+        <BudgetItem budget={budgetWithCurrentSpent} showDelete={true} />
 
-        <AddExpenseFrom budgets={[budget]} />
+        <AddExpenseFrom budgets={[budgetWithCurrentSpent]} />
       </div>
 
       {/* analytics */}
